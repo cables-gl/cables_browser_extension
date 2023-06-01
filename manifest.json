@@ -1,0 +1,31 @@
+{
+
+  "description": "something something cables",
+  "manifest_version": 2,
+  "name": "cables",
+  "version": "1.0",
+  "homepage_url": "https://github.com/mdn/webextensions-examples/tree/master/beastify",
+  "icons": {
+    "48": "icons/beasts-48.png"
+  },
+
+  "permissions": [
+    "activeTab"
+  ],
+
+  "browser_action": {
+    "default_icon": "icons/cables.png",
+    "theme_icons": [{
+        "light": "icons/cables.png",
+        "dark": "icons/cables.png",
+        "size": 1024
+    }],
+    "default_title": "cables",
+    "default_popup": "popup/choose_beast.html"
+  },
+
+  "web_accessible_resources": [
+    "beasts/*.jpg"
+  ]
+
+}
