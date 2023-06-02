@@ -11,14 +11,14 @@ console.log("choose...js")
 
   browser.runtime.onMessage.addListener( (message) => {
 
-    if(message)
+    if(message.success)
     {
       document.getElementById("popup-content").innerHTML="found a patch!<pre> "+JSON.stringify(message,true,2)+"</pre>";
 
     }
     else
     {
-      document.getElementById("popup-content").innerHTML="no cables patch found";
+      document.getElementById("popup-content").innerHTML="no cables patch found :/";
     }
 
     // console.log(message)
@@ -121,12 +121,47 @@ function reportExecuteScriptError(error) {
  * and add a click handler.
  * If we couldn't inject the script, handle the error.
  */
+let str="";
+  browser.tabs.query({active: true, currentWindow: true}).then(
+    (tabs)=>
+    {
+      str+=JSON.stringify(tabs,false,4);
+      // document.getElementById("popup-content").innerHTML=str;
+    
+      console.log(tabs);
 
-  // const [tab] = await browser.tabs.query({active: true, currentWindow: true});
+      let gettingFrames = browser.webNavigation.getAllFrames({tabId: tabs[0].id}).then(
+        (a)=>
+        {
 
-browser.tabs.executeScript({file: "/content_scripts/beastify.js"})
-.catch(reportExecuteScriptError);
-// listenForClicks();
+          // console.log(JSON.stringify(a[0]));
+
+          for(let i=0;i<a.length;i++)
+            // console.log(a[i].tabId,JSON.stringify(a[i]));
+            browser.tabs.executeScript(a[i].tabId, {"file": "/content_scripts/beastify.js", "frameId": a[i].frameId});
+  
+
+        },
+        (err)=>{document.getElementById("popup-content").innerHTML=JSON.stringify(err);});
+
+        // document.getElementById("popup-content").innerHTML=gettingFrames.length+"!!!!";//str+JSON.stringify(gettingFrames,false,5);
+
+      
+
+    }, (err)=>{document.getElementById("popup-content").innerHTML=JSON.stringify(err);});
+  // console.log(tab);
+
+// browser.webNavigation.onCompleted.addListener(function(details)
+// {
+//   console.log("completed",details);
+//   // don't inject into the main frame (id = 0)
+//   // if(details.frameId != 0) {
+//     chrome.tabs.executeScript(details.tabId, {file: "js/contentScript.js", frameId: details.frameId});
+//   // }
+// });
+
+// browser.tabs.executeScript({file: "/content_scripts/beastify.js"})
+// .catch(reportExecuteScriptError);
 
 
 // browser.tabs.executeScript(()=>{return 12345;},result=>{

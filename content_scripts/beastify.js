@@ -6,15 +6,49 @@
    */
 
 
-const exp=JSON.stringify(window.wrappedJSObject.CABLES.exportedPatch.export);
+console.log(1);
+const cbl=window.wrappedJSObject.CABLES;
 
-if(window.wrappedJSObject.CABLES)console.log("cables var...");
-else console.log("NOOO cables var...");
+if(cbl)
+{
+  const cblPatch=window.wrappedJSObject.CABLES.patch||window.wrappedJSObject.CABLES.exportedPatch;
 
-if(window.wrappedJSObject.CABLES)
-browser.runtime.sendMessage({success:true,export:window.wrappedJSObject.CABLES.exportedPatch.export,build:window.wrappedJSObject.CABLES.build});
-else 
-browser.runtime.sendMessage({success:false,url:window.location.href});
+  if(!cblPatch)return noPatchFound();
+
+  const errors=[];
+
+  for(let i=0;i<cblPatch.ops.length;i++)
+  {
+    if(cblPatch.ops[i].uiAttribs.uierrors)
+      for(let j=0;j<cblPatch.ops[i].uiAttribs.uierrors.length;j++)
+      {
+        const item=cblPatch.ops[i].uiAttribs.uierrors[j]
+
+        if(item.level>=2)
+        {
+          errors.push(cblPatch.ops[i].uiAttribs.uierrors[j]);
+        }
+        
+
+      }
+      
+  }
+
+
+
+
+
+  browser.runtime.sendMessage({"success":true,"export":cblPatch.export,"build":window.wrappedJSObject.CABLES.build,"errors":errors});
+
+}
+else noPatchFound();
+
+
+function noPatchFound()
+{
+  browser.runtime.sendMessage({"success":false,"msg":"no patch found..."});
+}
+
 
 // document.getElementById("popup-content").innerHTML="huhuhuhu12121212";
 
